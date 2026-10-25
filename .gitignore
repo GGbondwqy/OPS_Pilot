@@ -1,0 +1,11 @@
+# 内部设计文档与本地笔记（不入公开仓库）
+*.docx
+*.doc
+
+# 本地工作区杂项
+backups/
+.zcode/
+
+# 系统
+Thumbs.db
+.DS_Store

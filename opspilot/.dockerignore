@@ -1,0 +1,15 @@
+# 镜像内不打入任何本地状态与密钥
+.env
+data/
+backups/
+.venv/
+.git/
+.github/
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+docs/
+scripts/
+*.md
+!README.md

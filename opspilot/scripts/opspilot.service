@@ -1,0 +1,33 @@
+# OpsPilot systemd 服务模板
+# 安装（把 /opt/opspilot 替换为你的实际部署路径）：
+#   sudo cp scripts/opspilot.service /etc/systemd/system/opspilot.service
+#   sudo sed -i 's#/opt/opspilot#<你的部署路径>#g' /etc/systemd/system/opspilot.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now opspilot
+# 查看日志：journalctl -u opspilot -f
+
+[Unit]
+Description=OpsPilot AIOps Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 用专用用户运行（推荐）：sudo useradd -r -s /usr/sbin/nologin opspilot && sudo chown -R opspilot:opspilot /opt/opspilot
+# 若用你自己的用户运行，把下面两行改为你的用户名
+User=opspilot
+Group=opspilot
+WorkingDirectory=/opt/opspilot
+# .env 需包含 OPSPILOT_HOST 与 OPSPILOT_PORT 两行（install.sh 复制的模板自带）
+EnvironmentFile=/opt/opspilot/.env
+ExecStart=/opt/opspilot/.venv/bin/python -m uvicorn app.main:app --host ${OPSPILOT_HOST} --port ${OPSPILOT_PORT}
+Restart=on-failure
+RestartSec=3
+
+# 基础安全加固
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/opspilot
+
+[Install]
+WantedBy=multi-user.target

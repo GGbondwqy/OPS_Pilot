@@ -1,0 +1,35 @@
+[
+  {
+    "event_id": "20001",
+    "host": "mall-server-01",
+    "service": "mall-portal",
+    "problem": "RabbitMQ 队列积压超过阈值且消费者数为 0",
+    "metric": "rabbitmq_queue_messages_ready",
+    "value": 130,
+    "threshold": 100,
+    "severity": "HIGH",
+    "occurred_at": "2026-10-24T19:00:00+08:00"
+  },
+  {
+    "event_id": "20002",
+    "host": "mall-server-01",
+    "service": "mall-admin",
+    "problem": "磁盘使用率超过 95%",
+    "metric": "vfs_fs_used_percent",
+    "value": 97.5,
+    "threshold": 95,
+    "severity": "HIGH",
+    "occurred_at": "2026-10-24T20:00:00+08:00"
+  },
+  {
+    "event_id": "20003",
+    "host": "mall-server-01",
+    "service": "mall-portal",
+    "problem": "Nginx 5xx 比例异常升高",
+    "metric": "nginx_http_5xx_rate",
+    "value": 0.42,
+    "threshold": 0.05,
+    "severity": "HIGH",
+    "occurred_at": "2026-10-24T21:00:00+08:00"
+  }
+]
