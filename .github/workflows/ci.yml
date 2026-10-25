@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: opspilot
+    working-directory: ops-doctor
 
 jobs:
   test:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: opspilot/requirements.txt
+          cache-dependency-path: ops-doctor/requirements.txt
 
       - name: Install dependencies
         run: |

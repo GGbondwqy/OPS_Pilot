@@ -1,6 +1,10 @@
-# OPS_Pilot — 开箱即用的智能运维 Agent × 电商系统演示平台
+# OpsDoctor（运维医生）— AI 值班运维 Agent
 
-[![CI](https://github.com/GGbondwqy/OPS_Pilot/actions/workflows/ci.yml/badge.svg)](https://github.com/GGbondwqy/OPS_Pilot/actions/workflows/ci.yml)
+**看名字就知道它干嘛：像医生一样给你的服务器看病。**
+
+收集症状（接收监控告警）→ 化验检查（只读证据采集）→ 诊断（AI + 运维知识库 RAG）→ 开处方（修复建议）→ 家属签字（人工审批）→ 治疗（执行预定义动作）→ 复诊（独立业务复验）→ 病历归档（审计与周报）。
+
+[![CI](https://github.com/GGbondwqy/OpsDoctor/actions/workflows/ci.yml/badge.svg)](https://github.com/GGbondwqy/OpsDoctor/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -12,7 +16,7 @@
 
 | 目录 | 项目 | 技术栈 | 说明 |
 | --- | --- | --- | --- |
-| [`opspilot/`](opspilot/) | **项目 A：OpsPilot 智能运维 Agent**（自研） | Python 3.10+ / FastAPI / SQLite | 告警接入、证据调查、RAG、审批式修复、复验闭环。零配置可跑，已内置测试与 CI |
+| [`ops-doctor/`](ops-doctor/) | **项目 A：OpsDoctor 智能运维 Agent**（自研） | Python 3.10+ / FastAPI / SQLite | 告警接入、证据调查、RAG、审批式修复、复验闭环。零配置可跑，已内置测试与 CI |
 | [`mall-deploy/`](mall-deploy/) | **项目 B：mall 电商系统部署套件**（复用开源 [macrozheng/mall](https://github.com/macrozheng/mall)） | Java 17 / Spring Boot | Linux 部署清单、中间件 Compose、可观测性改造与故障演练说明 |
 
 ## 系统架构
@@ -35,7 +39,7 @@ Zabbix / 模拟告警 ──▶ POST /webhook/zabbix（幂等去重，202 异步
               通知（本地文件 / Webhook / 钉钉） + 周报 + 超期追踪
 ```
 
-与 mall 的配合：mall 的 Actuator 健康端点与 RabbitMQ 队列指标由 Zabbix 采集并触发告警，推送给 OpsPilot 处理；修复动作经审批后作用于实验环境的 mall 服务。
+与 mall 的配合：mall 的 Actuator 健康端点与 RabbitMQ 队列指标由 Zabbix 采集并触发告警，推送给 OpsDoctor 处理；修复动作经审批后作用于实验环境的 mall 服务。
 
 ## 特性
 
@@ -51,8 +55,8 @@ Zabbix / 模拟告警 ──▶ POST /webhook/zabbix（幂等去重，202 异步
 要求：Linux + Python ≥ 3.10。
 
 ```bash
-git clone https://github.com/GGbondwqy/OPS_Pilot.git
-cd OPS_Pilot/opspilot
+git clone https://github.com/GGbondwqy/OpsDoctor.git
+cd OpsDoctor/ops-doctor
 bash scripts/install.sh     # 安装：venv + 依赖 + 数据库 + 知识库 + 自动生成令牌
 ```
 
@@ -75,19 +79,19 @@ python -m app.cli approve 1 --approver 你的名字    # 审批 → 自动执行
 
 | 文档 | 内容 |
 | --- | --- |
-| [opspilot/README.md](opspilot/README.md) | Agent 功能、CLI、API、安全模型、FAQ |
+| [ops-doctor/README.md](ops-doctor/README.md) | Agent 功能、CLI、API、安全模型、FAQ |
 | [mall-deploy/DEPLOYMENT.md](mall-deploy/DEPLOYMENT.md) | **全链路部署总纲（从这里开始）**：拓扑方案、端口矩阵、6 个部署阶段与验证判据、联调演练 |
-| [opspilot/docs/DEPLOYMENT.md](opspilot/docs/DEPLOYMENT.md) | OpsPilot 部署手册：systemd 常驻、防火墙、备份升级、安全加固、排障 |
-| [opspilot/docs/zabbix-integration.md](opspilot/docs/zabbix-integration.md) | Zabbix 对接：Webhook 脚本与逐步配置 |
-| [opspilot/docs/holmesgpt-mcp.md](opspilot/docs/holmesgpt-mcp.md) | MCP 只读服务与 HolmesGPT 接入 |
-| [opspilot/docs/architecture.md](opspilot/docs/architecture.md) | 架构细节：状态机、信任域、流水线、扩展点 |
+| [ops-doctor/docs/DEPLOYMENT.md](ops-doctor/docs/DEPLOYMENT.md) | OpsDoctor 部署手册：systemd 常驻、防火墙、备份升级、安全加固、排障 |
+| [ops-doctor/docs/zabbix-integration.md](ops-doctor/docs/zabbix-integration.md) | Zabbix 对接：Webhook 脚本与逐步配置 |
+| [ops-doctor/docs/holmesgpt-mcp.md](ops-doctor/docs/holmesgpt-mcp.md) | MCP 只读服务与 HolmesGPT 接入 |
+| [ops-doctor/docs/architecture.md](ops-doctor/docs/architecture.md) | 架构细节：状态机、信任域、流水线、扩展点 |
 | [mall-deploy/README.md](mall-deploy/README.md) | mall 固定版本、中间件、可观测性改造 |
 
 ## 仓库结构
 
 ```
-OPS_Pilot/
-├── opspilot/                  # 项目 A：智能运维 Agent（自研，MIT）
+OpsDoctor/
+├── ops-doctor/                  # 项目 A：智能运维 Agent（自研，MIT）
 │   ├── app/                   #   FastAPI / worker / agent / rag / policy / mcp / cli
 │   ├── knowledge/runbooks/    #   运维知识库（6 份合成 Runbook）
 │   ├── tests/                 #   29 个 pytest（API/幂等/策略/RAG/端到端/周报）
@@ -102,11 +106,11 @@ OPS_Pilot/
 └── .github/workflows/         # CI：ubuntu + Python 3.10/3.12 跑测试与冒烟
 ```
 
-> 目录边界按「可拆分」设计：`opspilot/` 完全自包含，将来可独立成单独仓库发布，代码零改动。
+> 目录边界按「可拆分」设计：`ops-doctor/` 完全自包含，将来可独立成单独仓库发布，代码零改动。
 
 ## 部署顺序速览
 
-1. **OpsPilot**（10 分钟）：`opspilot/` 内 3 条命令，零依赖跑通完整闭环
+1. **OpsDoctor**（10 分钟）：`ops-doctor/` 内 3 条命令，零依赖跑通完整闭环
 2. **AI 模型**（可选，5 分钟）：`python -m app.cli setup` 填三项配置
 3. **mall + 中间件**（半天）：`mall-deploy/` 按 README 固定版本后部署
 4. **Zabbix 联调**（1 小时）：Webhook 模板现成，步骤见对接文档
@@ -115,10 +119,10 @@ OPS_Pilot/
 
 ## 开源边界
 
-- **OpsPilot 为本项目自研**：Webhook 契约与幂等、事故状态机、MCP 只读工具、Runbook RAG、LLM 调查与规则降级、审批白名单、假恢复拦截、周报闭环与测试基准。
+- **OpsDoctor 为本项目自研**：Webhook 契约与幂等、事故状态机、MCP 只读工具、Runbook RAG、LLM 调查与规则降级、审批白名单、假恢复拦截、周报闭环与测试基准。
 - **mall 为开源复用**（macrozheng/mall）：本项目的贡献是可观测性埋点方案、监控适配、故障演练开关与业务一致性验证；mall 版权与许可证归属原作者，部署前请查阅其仓库说明。
 - **HolmesGPT 为可选进阶集成**，不属于本项目自研范围。
 
 ## License
 
-[MIT](LICENSE)（opspilot 部分）
+[MIT](LICENSE)（ops-doctor 部分）

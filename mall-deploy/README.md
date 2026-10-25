@@ -1,8 +1,8 @@
 # mall 电商系统 Linux 部署套件（项目 B）
 
-[mall](https://github.com/macrozheng/mall) 是开源 Java 电商项目（Spring Boot 3.5+ / JDK 17），本目录提供把它部署到 Linux 作为 **OpsPilot 诊断目标** 的部署清单与演练说明。mall 本身的业务代码不做修改，我们在其上补充可观测性与故障演练能力。
+[mall](https://github.com/macrozheng/mall) 是开源 Java 电商项目（Spring Boot 3.5+ / JDK 17），本目录提供把它部署到 Linux 作为 **OpsDoctor 诊断目标** 的部署清单与演练说明。mall 本身的业务代码不做修改，我们在其上补充可观测性与故障演练能力。
 
-> **部署整套系统（OpsPilot + mall + Zabbix）请先看全链路部署总纲：[DEPLOYMENT.md](DEPLOYMENT.md)**——含拓扑方案、部署顺序、端口矩阵与逐阶段验证。本 README 只覆盖 mall 自身的部署与改造。
+> **部署整套系统（OpsDoctor + mall + Zabbix）请先看全链路部署总纲：[DEPLOYMENT.md](DEPLOYMENT.md)**——含拓扑方案、部署顺序、端口矩阵与逐阶段验证。本 README 只覆盖 mall 自身的部署与改造。
 
 ## 0. 强制步骤：先固定版本
 
@@ -102,7 +102,7 @@ management:
 
 ## 4. 故障演练开关（仅实验环境）
 
-为演示「消费者停止 → 队列积压 → 告警 → OpsPilot 闭环」，需要一个可控的演练手段，例如：
+为演示「消费者停止 → 队列积压 → 告警 → OpsDoctor 闭环」，需要一个可控的演练手段，例如：
 
 - 在测试 Profile 提供一个仅内网可达的演练端点：`POST /ops-demo/consumer/pause`、`POST /ops-demo/consumer/resume`；
 - 或直接用 `docker compose stop mall-portal` / `start mall-portal` 模拟服务级故障；
@@ -110,17 +110,17 @@ management:
 
 **禁止在生产环境执行任何演练。**
 
-## 5. 与 Zabbix、OpsPilot 的联调链路
+## 5. 与 Zabbix、OpsDoctor 的联调链路
 
 ```
-mall (Actuator/指标) ──采集──▶ Zabbix ──Trigger──▶ Webhook ──▶ OpsPilot
+mall (Actuator/指标) ──采集──▶ Zabbix ──Trigger──▶ Webhook ──▶ OpsDoctor
                                                                  │
         mall-portal ◀──预定义动作(审批后)── 复验通过 ◀── 调查/审批 ──┘
 ```
 
 1. Zabbix 添加 `mall-server-01` Host，先只配 `/actuator/health` 一个监控项 + 一个 Trigger；
-2. 配置 Webhook Media Type 推送到 OpsPilot（模板见 `opspilot/scripts/zabbix_webhook.js`，步骤见 `opspilot/docs/zabbix-integration.md`）；
-3. 暂停消费者（演练开关）→ 观察：Zabbix Problem → OpsPilot 收告警 → 调查 → 待审批 → 审批 → 恢复动作 → 复验通过 → RESOLVED；
+2. 配置 Webhook Media Type 推送到 OpsDoctor（模板见 `ops-doctor/scripts/zabbix_webhook.js`，步骤见 `ops-doctor/docs/zabbix-integration.md`）；
+3. 暂停消费者（演练开关）→ 观察：Zabbix Problem → OpsDoctor 收告警 → 调查 → 待审批 → 审批 → 恢复动作 → 复验通过 → RESOLVED；
 4. 记录演练时间线与截图（验收要求保留 1 条成功恢复、1 条审批拒绝、1 条未恢复升级）。
 
 ## 6. 部署检查清单
@@ -133,4 +133,4 @@ mall (Actuator/指标) ──采集──▶ Zabbix ──Trigger──▶ Webho
 - [ ] Prometheus 指标端点可访问（仅运维网段）
 - [ ] 演练开关只在测试 Profile 生效
 - [ ] 数据库用独立账号独立库，口令不入 Git
-- [ ] OpsPilot 能收到 Zabbix 告警且重复推送被去重
+- [ ] OpsDoctor 能收到 Zabbix 告警且重复推送被去重
