@@ -37,7 +37,7 @@ jobs:
       - name: Run tests
         run: python -m pytest tests/ -v
 
-      - name: Smoke: start server and check health
+      - name: "Smoke: start server and check health"
         run: |
           python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
           for i in $(seq 1 30); do
